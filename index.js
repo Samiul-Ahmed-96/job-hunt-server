@@ -25,6 +25,7 @@ const run = async () => {
     console.log("db connected");
     const database = client.db("job-hunt");
     const usersCollection = database.collection("users");
+    const jobCollection = database.collection("job");
 
     app.get("/users", async (req, res) => {
       const cursor = usersCollection.find({});
@@ -40,17 +41,31 @@ const run = async () => {
 
     app.get("/user/:email", async (req, res) => {
       const email = req.params.email;
-      console.log("hit",email);
-
       const result = await usersCollection.findOne({ email });
-      console.log(result)
       if (result?.email) {
         return res.send({ status: true, data: result });
-      
       }
-
       res.send({ status: false });
     });
+
+    app.get("/jobs" ,  async (req , res ) =>{
+      const cursor = jobCollection.find({});
+      const result = await cursor.toArray();
+      res.send({status:true , data : result})
+    })
+
+    app.get("/job/:id" , async(req,res) =>{
+      const jobId = req.params.id;
+      const result = await jobCollection.findOne({_id: ObjectId(jobId)});
+      res.send({status:true , data:result})
+    })
+
+    app.post("/job" , async(req,res) =>{
+      const job = req.body;
+      const result =  await jobCollection.insertOne(job);
+      res.send({status : true , data : result})
+    })
+
   } finally {
   }
 };
