@@ -26,7 +26,7 @@ const run = async () => {
     const database = client.db("job-hunt");
     const usersCollection = database.collection("users");
     const jobCollection = database.collection("job");
-
+    
     app.get("/users", async (req, res) => {
       const cursor = usersCollection.find({});
       const users = await cursor.toArray();
@@ -57,6 +57,15 @@ const run = async () => {
     app.get("/job/:id", async (req, res) => {
       const jobId = req.params.id;
       const result = await jobCollection.findOne({ _id: ObjectId(jobId) });
+      res.send({ status: true, data: result });
+    });
+
+    app.get("/applied-jobs/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { applicants: { $elemMatch: { email: email } } };
+      const cursor = jobCollection.find(query).project({ applicants: 0 });
+      const result = await cursor.toArray();
+
       res.send({ status: true, data: result });
     });
 
