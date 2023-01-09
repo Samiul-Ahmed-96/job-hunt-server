@@ -149,6 +149,12 @@ const run = async () => {
       const result = await jobCollection.findOne({ _id: ObjectId(id) });
       res.send({ status: true, data: result });
     });
+    
+    app.delete("/job/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await jobCollection.deleteOne({ _id: ObjectId(id) });
+      res.send({ status: true, data: result });
+    });
 
     app.post("/job", async (req, res) => {
       const job = req.body;
