@@ -24,55 +24,33 @@ const run = async () => {
     await client.connect();
     console.log("db connected");
     const database = client.db("job-hunt");
-    const usersCollection = database.collection("users");
+    const userCollection = database.collection("user");
     const jobCollection = database.collection("job");
 
-    app.get("/users", async (req, res) => {
-      const cursor = usersCollection.find({});
-      const users = await cursor.toArray();
-      res.send({ status: true, data: users });
-    });
+    app.get("/users", async (req,res) =>{
+      const cursor  = userCollection.find({})
+      const result = await cursor.toArray();
+      res.send({ status: true, data: result });
+    })
 
     app.post("/user", async (req, res) => {
       const user = req.body;
-      const result = await usersCollection.insertOne(user);
-      res.send({ status: true, data: result });
+
+      const result = await userCollection.insertOne(user);
+
+      res.send(result);
     });
 
     app.get("/user/:email", async (req, res) => {
       const email = req.params.email;
-      const result = await usersCollection.findOne({ email });
+
+      const result = await userCollection.findOne({ email });
+
       if (result?.email) {
         return res.send({ status: true, data: result });
       }
+
       res.send({ status: false });
-    });
-
-    app.get("/jobs", async (req, res) => {
-      const cursor = jobCollection.find({});
-      const result = await cursor.toArray();
-      res.send({ status: true, data: result });
-    });
-
-    app.get("/job/:id", async (req, res) => {
-      const jobId = req.params.id;
-      const result = await jobCollection.findOne({ _id: ObjectId(jobId) });
-      res.send({ status: true, data: result });
-    });
-
-    app.get("/applied-jobs/:email", async (req, res) => {
-      const email = req.params.email;
-      const query = { applicants: { $elemMatch: { email: email } } };
-      const cursor = jobCollection.find(query).project({ applicants: 0 });
-      const result = await cursor.toArray();
-
-      res.send({ status: true, data: result });
-    });
-
-    app.post("/job", async (req, res) => {
-      const job = req.body;
-      const result = await jobCollection.insertOne(job);
-      res.send({ status: true, data: result });
     });
 
     app.patch("/apply", async (req, res) => {
@@ -119,6 +97,65 @@ const run = async () => {
       }
 
       res.send({ status: false });
+    });
+
+    app.patch("/reply", async (req, res) => {
+      const userId = req.body.userId;
+      const reply = req.body.reply;
+      console.log(reply);
+      console.log(userId);
+
+      const filter = { "queries.id": ObjectId(userId) };
+
+      const updateDoc = {
+        $push: {
+          "queries.$[user].reply": reply,
+        },
+      };
+      const arrayFilter = {
+        arrayFilters: [{ "user.id": ObjectId(userId) }],
+      };
+
+      const result = await jobCollection.updateOne(
+        filter,
+        updateDoc,
+        arrayFilter
+      );
+      if (result.acknowledged) {
+        return res.send({ status: true, data: result });
+      }
+
+      res.send({ status: false });
+    });
+
+    app.get("/applied-jobs/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { applicants: { $elemMatch: { email: email } } };
+      const cursor = jobCollection.find(query).project({ applicants: 0 });
+      const result = await cursor.toArray();
+
+      res.send({ status: true, data: result });
+    });
+
+    app.get("/jobs", async (req, res) => {
+      const cursor = jobCollection.find({});
+      const result = await cursor.toArray();
+      res.send({ status: true, data: result });
+    });
+
+    app.get("/job/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const result = await jobCollection.findOne({ _id: ObjectId(id) });
+      res.send({ status: true, data: result });
+    });
+
+    app.post("/job", async (req, res) => {
+      const job = req.body;
+
+      const result = await jobCollection.insertOne(job);
+
+      res.send({ status: true, data: result });
     });
 
     app.patch("/reply", async (req, res) => {
