@@ -27,11 +27,11 @@ const run = async () => {
     const userCollection = database.collection("user");
     const jobCollection = database.collection("job");
 
-    app.get("/users", async (req,res) =>{
-      const cursor  = userCollection.find({})
+    app.get("/users", async (req, res) => {
+      const cursor = userCollection.find({});
       const result = await cursor.toArray();
       res.send({ status: true, data: result });
-    })
+    });
 
     app.post("/user", async (req, res) => {
       const user = req.body;
@@ -145,11 +145,17 @@ const run = async () => {
 
     app.get("/job/:id", async (req, res) => {
       const id = req.params.id;
-
       const result = await jobCollection.findOne({ _id: ObjectId(id) });
       res.send({ status: true, data: result });
     });
-    
+
+    app.get("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id)
+      const result = await userCollection.findOne({ _id: ObjectId(id) });
+      res.send({ status: true, data: result });
+    });
+
     app.delete("/job/:id", async (req, res) => {
       const id = req.params.id;
       const result = await jobCollection.deleteOne({ _id: ObjectId(id) });
