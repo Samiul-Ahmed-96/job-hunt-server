@@ -26,9 +26,16 @@ const run = async () => {
     const database = client.db("job-hunt");
     const userCollection = database.collection("user");
     const jobCollection = database.collection("job");
+    const chatCollection = database.collection("chat");
+  
 
     app.get("/users", async (req, res) => {
       const cursor = userCollection.find({});
+      const result = await cursor.toArray();
+      res.send({ status: true, data: result });
+    });
+    app.get("/chats", async (req, res) => {
+      const cursor = chatCollection.find({});
       const result = await cursor.toArray();
       res.send({ status: true, data: result });
     });
@@ -40,6 +47,12 @@ const run = async () => {
 
       res.send(result);
     });
+
+    app.post("/chat", async(req,res)=>{
+      const chatData = req.body;
+      const result = await chatCollection.insertOne(chatData);
+      res.send({status:true , data : result})
+    })
 
     app.get("/user/:email", async (req, res) => {
       const email = req.params.email;
