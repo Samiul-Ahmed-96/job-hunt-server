@@ -27,7 +27,6 @@ const run = async () => {
     const userCollection = database.collection("user");
     const jobCollection = database.collection("job");
     const chatCollection = database.collection("chat");
-  
 
     app.get("/users", async (req, res) => {
       const cursor = userCollection.find({});
@@ -48,11 +47,11 @@ const run = async () => {
       res.send(result);
     });
 
-    app.post("/chat", async(req,res)=>{
+    app.post("/chat", async (req, res) => {
       const chatData = req.body;
       const result = await chatCollection.insertOne(chatData);
-      res.send({status:true , data : result})
-    })
+      res.send({ status: true, data: result });
+    });
 
     app.get("/user/:email", async (req, res) => {
       const email = req.params.email;
@@ -115,9 +114,7 @@ const run = async () => {
     app.patch("/reply", async (req, res) => {
       const userId = req.body.userId;
       const reply = req.body.reply;
-      console.log(reply);
-      console.log(userId);
-
+      
       const filter = { "queries.id": ObjectId(userId) };
 
       const updateDoc = {
@@ -164,7 +161,7 @@ const run = async () => {
 
     app.get("/users/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id)
+      console.log(id);
       const result = await userCollection.findOne({ _id: ObjectId(id) });
       res.send({ status: true, data: result });
     });
@@ -186,8 +183,6 @@ const run = async () => {
     app.patch("/reply", async (req, res) => {
       const userId = req.body.userId;
       const reply = req.body.reply;
-      console.log(reply);
-      console.log(userId);
 
       const filter = { "queries.id": ObjectId(userId) };
 
