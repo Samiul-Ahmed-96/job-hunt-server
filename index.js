@@ -114,7 +114,7 @@ const run = async () => {
     app.patch("/reply", async (req, res) => {
       const userId = req.body.userId;
       const reply = req.body.reply;
-      
+
       const filter = { "queries.id": ObjectId(userId) };
 
       const updateDoc = {
@@ -161,7 +161,6 @@ const run = async () => {
 
     app.get("/users/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const result = await userCollection.findOne({ _id: ObjectId(id) });
       res.send({ status: true, data: result });
     });
@@ -174,9 +173,7 @@ const run = async () => {
 
     app.post("/job", async (req, res) => {
       const job = req.body;
-
       const result = await jobCollection.insertOne(job);
-
       res.send({ status: true, data: result });
     });
 
